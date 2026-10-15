@@ -3,7 +3,6 @@ export interface Report {
   title: string;
   description: string;
   publicEmbedUrl: string;
-  captureInsets?: { top: number; right: number; bottom: number; left: number };
 }
 export interface Department {
   id: string;
@@ -18,8 +17,6 @@ export const DEPARTMENTS: readonly Department[] = [
       {
         id: 'graficas-y-canal',
         title: 'Gráficas y Canal',
-        // Host-frame CSS pixels: retain the full report canvas, omit player controls.
-        captureInsets: { top: 1, right: 1, bottom: 64, left: 1 },
         description: 'Consulta el informe interactivo y aplica sus filtros originales de Power BI.',
         publicEmbedUrl:
           'https://app.powerbi.com/view?r=eyJrIjoiY2FlMjBmOTYtZGI0ZS00NzIzLWE3ZTctMjdiYzIyNWUyMTU4IiwidCI6ImFmMmZkMTk2LTFkOWYtNDdiNC05MDY5LTM5MWE0NmY4MzYwMSIsImMiOjR9',
@@ -33,7 +30,6 @@ export const DEPARTMENTS: readonly Department[] = [
       {
         id: 'trans-puerto-cortes',
         title: 'Trans_PuertoCortés',
-        captureInsets: { top: 1, right: 1, bottom: 64, left: 1 },
         description:
           'Informe público de TRANS de Puerto Cortés. Consulta sus gráficos y filtros originales.',
         publicEmbedUrl:

@@ -1,10 +1,5 @@
 <header>
-  <button
-    class="brand brand-button"
-    (click)="showHome()"
-    [disabled]="busy"
-    aria-label="Ir al inicio"
-  >
+  <button class="brand brand-button" (click)="showHome()" aria-label="Ir al inicio">
     ✚ <span>Portal de indicadores<small>INFORMACIÓN PARA LA SALUD</small></span></button
   ><span class="badge">Consulta pública</span>
 </header>
@@ -12,7 +7,7 @@
   <div class="intro">
     <p class="eyebrow">OBSERVATORIO DE SALUD</p>
     <h1>Los datos, a tu alcance.</h1>
-    <p>Consulta el informe, aplica sus filtros y guarda una captura del resultado.</p>
+    <p>Consulta los indicadores de salud y explora sus filtros por departamento.</p>
   </div>
   @if (home) {
     <section class="overview" aria-label="Explorar indicadores">
@@ -21,7 +16,7 @@
         ><span>Departamentos disponibles</span>
       </div>
       <div><strong>Power BI</strong><span>Informes interactivos originales</span></div>
-      <div><strong>PNG / PDF</strong><span>Capturas para descargar y compartir</span></div>
+      <div><strong>PC y móvil</strong><span>Consulta desde tu dispositivo</span></div>
     </section>
     <section aria-labelledby="catalog-title">
       <div class="heading">
@@ -77,17 +72,15 @@
           <p>Ajusta los filtros originales dentro de Power BI.</p>
         </div>
         <div>
-          <h3>03 · Guarda</h3>
-          <p>Captura el resultado o sube una imagen del dispositivo para exportarla.</p>
+          <h3>03 · Explora</h3>
+          <p>Amplía el visor o abre el informe original para consultar sus gráficos.</p>
         </div>
       </div>
     </section>
   }
   <div [hidden]="home">
     <nav class="panel" [attr.aria-label]="'Informes de ' + department.name">
-      <button class="secondary" (click)="showHome()" [disabled]="busy">
-        ← Todos los departamentos
-      </button>
+      <button class="secondary" (click)="showHome()">← Todos los departamentos</button>
       <p class="eyebrow">DEPARTAMENTO</p>
       <h2>{{ department.name }}</h2>
       <div class="actions">
@@ -95,7 +88,6 @@
           <button
             [class.secondary]="report.id !== item.id"
             [attr.aria-pressed]="report.id === item.id"
-            [disabled]="busy"
             (click)="selectReport(department.id, item.id)"
           >
             {{ item.title }}
@@ -107,47 +99,11 @@
     <app-report-viewer
       [report]="report"
       [department]="department.name"
-      [busy]="busy"
-      [supported]="supported"
-      (exportRequest)="automatic($event)"
       (notice)="message = $event"
     />
     @if (message) {
       <p class="notice" role="status">{{ message }}</p>
     }
-    @if (busy) {
-      <p class="notice" role="status">Preparando el estado actual del informe…</p>
-    }
-    <details class="panel" [open]="fallbackOpen">
-      <summary>Usar una captura del dispositivo</summary>
-      <p>
-        Alternativa para móviles y navegadores sin captura automática. Sube una captura reciente: se
-        usará la imagen completa, sin edición.
-      </p>
-      <label
-        >Acción<select
-          aria-label="Acción para la captura"
-          [value]="fallbackAction"
-          (change)="fallbackAction = $any($event.target).value"
-        >
-          <option value="png">Descargar imagen PNG</option>
-          <option value="pdf">Descargar PDF</option>
-          <option value="print">Imprimir</option>
-        </select></label
-      >
-      <label class="upload"
-        >Subir captura<input
-          type="file"
-          accept="image/*"
-          [disabled]="busy"
-          (change)="upload($event)"
-      /></label>
-    </details>
-    @if (result) {
-      <p class="hint">
-        Última exportación: {{ date }}. Cada acción desde el visor genera una captura nueva.
-      </p>
-    }
   </div>
-  <footer>Portal de indicadores de salud · Capturas locales · Acceso público</footer>
+  <footer>Portal de indicadores de salud · Informes interactivos · Acceso público</footer>
 </main>

@@ -22,8 +22,7 @@ jobs:
       - run: npm ci
       - run: npm test -- --watch=false
       - run: npx playwright install --with-deps chromium webkit
-      - name: Probar captura con escritorio virtual
-        run: xvfb-run --auto-servernum npm run test:e2e -- --headed
+      - run: npm run test:e2e
       - name: Compilar para la ruta del repositorio
         env:
           REPOSITORY_NAME: ${{ github.event.repository.name }}

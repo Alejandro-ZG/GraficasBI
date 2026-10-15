@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Report, validateReportUrl } from './catalog';
-import { ReportExportRequest } from './capture.service';
 @Component({
   selector: 'app-report-viewer',
   template: `<section class="panel report-viewer" #viewer aria-labelledby="report-title">
@@ -26,42 +25,10 @@ import { ReportExportRequest } from './capture.service';
     </p>
     <div class="actions">
       <button class="secondary" (click)="fullscreen(viewer)">Pantalla completa / Salir</button
-      ><button class="secondary" (click)="reload(frame)" [disabled]="busy()">
-        Recargar informe
-      </button>
-      <button
-        (click)="
-          exportRequest.emit({ format: 'png', target: frame, insets: report().captureInsets })
-        "
-        [disabled]="busy()"
-      >
-        Descargar imagen
-      </button>
-      <button
-        (click)="
-          exportRequest.emit({ format: 'pdf', target: frame, insets: report().captureInsets })
-        "
-        [disabled]="busy()"
-      >
-        Descargar PDF
-      </button>
-      <button
-        (click)="
-          exportRequest.emit({ format: 'print', target: frame, insets: report().captureInsets })
-        "
-        [disabled]="busy()"
-      >
-        Imprimir
-      </button>
+      ><button class="secondary" (click)="reload(frame)">Recargar informe</button>
     </div>
     <p class="hint">
-      Aplica tus filtros y elige descargar o imprimir. Autoriza la captura de
-      <strong>esta pestaña del portal</strong>: el área del informe se detecta automáticamente, sin
-      editar ni recortar.
-    </p>
-    <p class="hint">
-      Se exporta el área visible del informe. Recargar puede reiniciar los filtros y no fuerza la
-      actualización de la caché de Power BI.
+      Recargar puede reiniciar los filtros y no fuerza la actualización de la caché de Power BI.
     </p>
     @if (waiting) {
       <p role="status" class="hint">
@@ -81,9 +48,6 @@ import { ReportExportRequest } from './capture.service';
 export class ReportViewer {
   readonly report = input.required<Report>();
   readonly department = input.required<string>();
-  readonly supported = input(false);
-  readonly busy = input(false);
-  readonly exportRequest = output<ReportExportRequest>();
   readonly notice = output<string>();
   private readonly changes = inject(ChangeDetectorRef);
   private readonly sanitizer = inject(DomSanitizer);
@@ -111,7 +75,6 @@ export class ReportViewer {
     this.waiting = false;
   }
   reload(frame: HTMLIFrameElement) {
-    if (this.busy()) return;
     this.armTimeout();
     frame.src = this.url();
     this.notice.emit(

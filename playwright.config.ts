@@ -21,7 +21,6 @@ export default defineConfig({
       name: 'chrome',
       use: {
         ...devices['Desktop Chrome'],
-        launchOptions: { args: ['--auto-accept-this-tab-capture'] },
         ...(process.env['CI'] ? {} : { channel: 'chrome' }),
       },
     },
@@ -29,7 +28,6 @@ export default defineConfig({
       name: 'edge',
       use: {
         ...devices['Desktop Edge'],
-        launchOptions: { args: ['--auto-accept-this-tab-capture'] },
         ...(process.env['CI'] ? {} : { channel: 'msedge' }),
       },
     },
