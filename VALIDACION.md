@@ -14,6 +14,8 @@
 
 El navegador aislado de pruebas usa la opción oficial de Chromium `--auto-accept-this-tab-capture` para aceptar la captura de su propia pestaña de prueba. Esa opción no se utiliza en el sitio publicado: cada usuario debe conceder permiso.
 
+En GitHub Actions las pruebas se ejecutan con un escritorio virtual Xvfb y navegador con interfaz, porque la captura de pestaña no está soportada por el ejecutable headless de Chromium del runner Linux.
+
 ## Límites
 
 - La aplicación solicita autorización y exige la pestaña exacta del portal. Si se elige otra pestaña, ventana o pantalla, detiene la captura y muestra un mensaje; no estima coordenadas de una fuente ajena.
