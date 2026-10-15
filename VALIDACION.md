@@ -34,3 +34,7 @@ En GitHub Actions las pruebas se ejecutan con un escritorio virtual Xvfb y naveg
 4. Repetir con Imprimir; revisar la hoja y elegir impresora o guardar como PDF.
 5. Cancelar el permiso o elegir otra pestaña: debe aparecer un mensaje y quedar la interfaz disponible.
 6. En móvil, desplegar Usar una captura del dispositivo, elegir acción y subir una captura reciente. La acción se ejecuta sobre la imagen completa.
+
+## Encuadre según referencia
+
+Se comprobó visualmente Epidemiología con el encuadre que conserva filtros, gráfico y crédito interno, eliminando las barras de zoom y navegación. La prueba del reproductor usa una franja roja inferior para confirmar que queda fuera de la imagen exportada. Se mantienen las proporciones y se ajusta la escala entre píxeles CSS y vídeo.

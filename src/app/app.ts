@@ -97,7 +97,7 @@ export class App {
     }
     this.busy = true;
     try {
-      this.result = this.source = await this.captures.region(request.target);
+      this.result = this.source = await this.captures.region(request.target, request.insets);
       this.date = new Date().toLocaleString('es-HN');
       await this.perform(request.format);
     } catch (error) {

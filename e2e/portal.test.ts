@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('https://app.powerbi.com/**', (route) =>
     route.fulfill({
       contentType: 'text/html',
-      body: '<html style="background:#087f80;height:100%"><body style="margin:0;background:#087f80;color:white">INFORME FILTRADO DE PRUEBA</body></html>',
+      body: '<html style="background:#087f80;height:100%"><body style="margin:0;background:#087f80;color:white">INFORME FILTRADO DE PRUEBA<div style="position:fixed;bottom:0;left:0;width:100%;height:62px;background:#ff0000">CONTROLES DEL REPRODUCTOR</div></body></html>',
     }),
   );
   await page.goto('/');
@@ -98,8 +98,8 @@ for (const format of ['png', 'pdf', 'print'] as const)
     const bounds = await page.locator('iframe').evaluate((el) => {
       const r = el.getBoundingClientRect();
       return {
-        width: Math.round(r.width),
-        height: Math.round(Math.min(r.height, innerHeight - 24)),
+        width: Math.round(r.width - 2),
+        height: Math.round(Math.min(r.height, innerHeight - 24) - 65),
       };
     });
     const pending = format === 'print' ? null : page.waitForEvent('download');
@@ -122,6 +122,7 @@ for (const format of ['png', 'pdf', 'print'] as const)
             width: c.width,
             height: c.height,
             pixel: Array.from(ctx.getImageData(c.width / 2, c.height / 2, 1, 1).data),
+            bottomPixel: Array.from(ctx.getImageData(c.width / 2, c.height - 8, 1, 1).data),
           };
         }, content.toString('base64'));
         // The browser may downscale tab capture. Compare the target's aspect ratio,
@@ -138,6 +139,9 @@ for (const format of ['png', 'pdf', 'print'] as const)
         expect(sample.pixel[2], JSON.stringify(sample)).toBeGreaterThan(90);
         expect(sample.pixel[2], JSON.stringify(sample)).toBeLessThan(170);
         expect(sample.pixel[3]).toBe(255);
+        // The red test player toolbar must never appear at the exported bottom edge.
+        expect(sample.bottomPixel[0], JSON.stringify(sample)).toBeLessThan(40);
+        expect(sample.bottomPixel[1], JSON.stringify(sample)).toBeGreaterThan(90);
       }
     } else {
       await expect(page.getByRole('status')).toContainText('diálogo de impresión');

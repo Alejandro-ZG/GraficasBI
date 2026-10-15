@@ -29,13 +29,28 @@ import { ReportExportRequest } from './capture.service';
       ><button class="secondary" (click)="reload(frame)" [disabled]="busy()">
         Recargar informe
       </button>
-      <button (click)="exportRequest.emit({ format: 'png', target: frame })" [disabled]="busy()">
+      <button
+        (click)="
+          exportRequest.emit({ format: 'png', target: frame, insets: report().captureInsets })
+        "
+        [disabled]="busy()"
+      >
         Descargar imagen
       </button>
-      <button (click)="exportRequest.emit({ format: 'pdf', target: frame })" [disabled]="busy()">
+      <button
+        (click)="
+          exportRequest.emit({ format: 'pdf', target: frame, insets: report().captureInsets })
+        "
+        [disabled]="busy()"
+      >
         Descargar PDF
       </button>
-      <button (click)="exportRequest.emit({ format: 'print', target: frame })" [disabled]="busy()">
+      <button
+        (click)="
+          exportRequest.emit({ format: 'print', target: frame, insets: report().captureInsets })
+        "
+        [disabled]="busy()"
+      >
         Imprimir
       </button>
     </div>

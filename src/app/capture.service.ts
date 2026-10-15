@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import type { Report } from './catalog';
 
 export interface Crop {
   x: number;
@@ -10,6 +11,7 @@ export type ReportAction = 'png' | 'pdf' | 'print';
 export interface ReportExportRequest {
   format: ReportAction;
   target: HTMLElement;
+  insets?: Report['captureInsets'];
 }
 interface PortalCaptureTrack extends MediaStreamTrack {
   getCaptureHandle?(): { handle?: string } | null;
@@ -60,7 +62,10 @@ export class CaptureService {
   get automaticSupported() {
     return this.supported && this.configured;
   }
-  async region(element: HTMLElement): Promise<string> {
+  async region(
+    element: HTMLElement,
+    insets: NonNullable<Report['captureInsets']> = { top: 0, right: 0, bottom: 0, left: 0 },
+  ): Promise<string> {
     if (!this.automaticSupported)
       throw new Error(
         'Este navegador no admite exportación automática del visor. Usa Chrome o Edge de escritorio, o sube una captura del dispositivo.',
@@ -105,10 +110,16 @@ export class CaptureService {
       // No access to the Power BI document or DOM is attempted.
       const sx = video.videoWidth / innerWidth,
         sy = video.videoHeight / innerHeight;
-      const x = Math.round(rect.left * sx),
-        y = Math.round(rect.top * sy);
-      const width = Math.round(rect.right * sx) - x,
-        height = Math.round(rect.bottom * sy) - y;
+      if (
+        Object.values(insets).some((value) => !Number.isFinite(value) || value < 0) ||
+        insets.left + insets.right >= rect.width ||
+        insets.top + insets.bottom >= rect.height
+      )
+        throw new Error('El encuadre configurado no cabe en el visor.');
+      const x = Math.round((rect.left + insets.left) * sx),
+        y = Math.round((rect.top + insets.top) * sy);
+      const width = Math.round((rect.right - insets.right) * sx) - x,
+        height = Math.round((rect.bottom - insets.bottom) * sy) - y;
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;

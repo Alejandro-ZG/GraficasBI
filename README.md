@@ -62,3 +62,7 @@ La actualización de los datos de Power BI no requiere desplegar el portal si el
 - https://developer.chrome.com/docs/web-platform/capture-handle/
 - https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-publish-to-web
 - https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+
+### Encuadre del informe
+
+El catálogo admite `captureInsets` por informe, medido en píxeles CSS del marco exterior. Epidemiología y TRANS excluyen el borde y los 64 píxeles inferiores del reproductor (zoom y navegación), conservando los filtros, el gráfico y el crédito que forman parte del reporte. No se modifica el estado de Power BI ni se lee su DOM. Si cambia el diseño del reproductor, recalibrar los márgenes del catálogo con una captura visual.
