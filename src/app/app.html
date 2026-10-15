@@ -84,27 +84,24 @@
     </section>
   }
   <div [hidden]="home">
-    <nav class="panel" aria-label="Catálogo de departamentos">
+    <nav class="panel" [attr.aria-label]="'Informes de ' + department.name">
       <button class="secondary" (click)="showHome()" [disabled]="busy">
         ← Todos los departamentos
       </button>
-      <p class="eyebrow">DEPARTAMENTOS</p>
-      <h2>Catálogo de informes</h2>
-      @for (area of departments; track area.id) {
-        <h3>{{ area.name }}</h3>
-        <div class="actions">
-          @for (item of area.reports; track item.id) {
-            <button
-              [class.secondary]="report.id !== item.id"
-              [attr.aria-pressed]="report.id === item.id"
-              [disabled]="busy"
-              (click)="selectReport(area.id, item.id)"
-            >
-              {{ item.title }}
-            </button>
-          }
-        </div>
-      }
+      <p class="eyebrow">DEPARTAMENTO</p>
+      <h2>{{ department.name }}</h2>
+      <div class="actions">
+        @for (item of department.reports; track item.id) {
+          <button
+            [class.secondary]="report.id !== item.id"
+            [attr.aria-pressed]="report.id === item.id"
+            [disabled]="busy"
+            (click)="selectReport(department.id, item.id)"
+          >
+            {{ item.title }}
+          </button>
+        }
+      </div>
       <p>{{ report.description }}</p>
     </nav>
     <app-report-viewer

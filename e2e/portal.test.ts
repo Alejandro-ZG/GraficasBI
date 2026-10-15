@@ -33,13 +33,11 @@ test('carga, recorte, PNG, PDF y alternativa de compartir', async ({ page }, inf
     ctx.fillRect(200, 100, 400, 200);
     return c.toDataURL('image/png').split(',')[1];
   });
-  await page
-    .locator('input[type=file]')
-    .setInputFiles({
-      name: 'grafico.png',
-      mimeType: 'image/png',
-      buffer: Buffer.from(png, 'base64'),
-    });
+  await page.locator('input[type=file]').setInputFiles({
+    name: 'grafico.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(png, 'base64'),
+  });
   await expect(page.getByAltText('Captura original')).toBeVisible();
   await page.getByLabel('Izquierda (%)').fill('25');
   await page.getByLabel('Arriba (%)').fill('25');
@@ -82,18 +80,17 @@ test('carga, recorte, PNG, PDF y alternativa de compartir', async ({ page }, inf
   const popup = await popupPromise;
   await expect(page.getByRole('status')).toContainText('PDF preparado');
   await popup.close();
-  await page.getByRole('button', { name: 'Trans_PuertoCortés', exact: true }).click();
+  await page.getByRole('button', { name: 'Todos los departamentos' }).click();
+  await page.getByRole('button', { name: 'Consultar informe' }).nth(1).click();
   await expect(page.getByAltText('Captura original')).toHaveCount(0);
 });
 test('archivos corruptos y recorte inválido no bloquean la interfaz', async ({ page }) => {
   await page.getByRole('button', { name: 'Consultar informe' }).first().click();
-  await page
-    .locator('input[type=file]')
-    .setInputFiles({
-      name: 'corrupto.png',
-      mimeType: 'image/png',
-      buffer: Buffer.from('not an image'),
-    });
+  await page.locator('input[type=file]').setInputFiles({
+    name: 'corrupto.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from('not an image'),
+  });
   await expect(page.getByRole('status')).toContainText('Imagen inválida');
   await expect(page.locator('input[type=file]')).toBeEnabled();
 });
@@ -146,4 +143,18 @@ test('captura un fotograma y detiene las pistas de la fuente simulada', async ({
         .every((track: MediaStreamTrack) => track.readyState === 'ended'),
     ),
   ).toBeTruthy();
+});
+
+test('cada departamento muestra únicamente sus propios informes', async ({ page }) => {
+  await page.getByRole('button', { name: 'Consultar informe' }).first().click();
+  await expect(page.getByRole('navigation', { name: 'Informes de Epidemiología' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Gráficas y Canal', exact: true })).toBeVisible();
+  await expect(page.getByText('TRANS', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Trans_PuertoCortés', { exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Todos los departamentos' }).click();
+  await page.getByRole('button', { name: 'Consultar informe' }).nth(1).click();
+  await expect(page.getByRole('navigation', { name: 'Informes de TRANS' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Trans_PuertoCortés', exact: true })).toBeVisible();
+  await expect(page.getByText('Epidemiología', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Gráficas y Canal', { exact: true })).toHaveCount(0);
 });
