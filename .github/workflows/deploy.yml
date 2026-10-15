@@ -1,0 +1,48 @@
+name: Publicar portal en GitHub Pages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --watch=false
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e
+      - name: Compilar para la ruta del repositorio
+        env:
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+        run: |
+          if [[ "$REPOSITORY_NAME" == *.github.io ]]; then
+            npm run build -- --base-href /
+          else
+            npm run build -- --base-href "/$REPOSITORY_NAME/"
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/portal-indicadores/browser
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4
