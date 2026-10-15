@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
-import { CaptureService } from './capture.service';
+import { CaptureService, ReportAction, ReportExportRequest } from './capture.service';
 import { ExportService } from './export.service';
 import { ReportViewer } from './report-viewer';
 import { DEPARTMENTS, validateReportUrl } from './catalog';
@@ -38,17 +38,15 @@ export class App {
   url = validateReportUrl(this.report.publicEmbedUrl);
 
   get supported() {
-    return this.captures.supported;
+    return this.captures.automaticSupported;
   }
   source = '';
   result = '';
   message = '';
   busy = false;
   date = '';
-  crop = { x: 0, y: 0, w: 100, h: 100 };
-  readonly fields = ['x', 'y', 'w', 'h'] as const;
-  readonly labels = { x: 'Izquierda', y: 'Arriba', w: 'Ancho', h: 'Alto' };
-  private original?: HTMLImageElement;
+  fallbackAction: ReportAction = 'png';
+  fallbackOpen = false;
   selectReport(departmentId: string, reportId: string) {
     if (this.busy) return;
     const department = this.departments.find((d) => d.id === departmentId);
@@ -62,79 +60,10 @@ export class App {
     this.report = report;
     this.url = url;
   }
-  async capture() {
-    if (this.busy) return;
-    this.busy = true;
-    this.message = '';
-    try {
-      await this.load(await this.captures.screen());
-    } catch (error) {
-      this.message =
-        error instanceof DOMException && error.name === 'NotAllowedError'
-          ? 'Captura cancelada o permiso rechazado. Puedes intentarlo de nuevo o subir una imagen.'
-          : error instanceof Error
-            ? error.message
-            : 'No se pudo capturar. Sube una captura del sistema.';
-    } finally {
-      this.busy = false;
-      this.changes.markForCheck();
-    }
-  }
-  async upload(event: Event) {
-    if (this.busy) return;
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = '';
-    if (!file) return;
-    if (!file.type.startsWith('image/') || file.size > 20 * 1024 * 1024) {
-      this.message = 'Selecciona una imagen de hasta 20 MB.';
-      return;
-    }
-    this.busy = true;
-    const url = URL.createObjectURL(file);
-    try {
-      await this.load(url);
-    } catch {
-      this.message =
-        'Imagen inválida o demasiado grande. Usa PNG o JPEG de menos de 40 megapíxeles.';
-    } finally {
-      URL.revokeObjectURL(url);
-      this.busy = false;
-      this.changes.markForCheck();
-    }
-  }
-  private async load(url: string) {
-    const img = await this.captures.image(url);
-    const source = this.captures.crop(img, { x: 0, y: 0, w: 100, h: 100 });
-    this.original = img;
-    this.source = source;
-    this.date = new Date().toLocaleString('es-HN');
-    this.reset();
-    this.message = '';
-  }
-  change(key: 'x' | 'y' | 'w' | 'h', e: Event) {
-    this.crop[key] = Math.max(0, Math.min(100, Number((e.target as HTMLInputElement).value) || 0));
-    this.result = '';
-  }
-  reset() {
-    this.crop = { x: 0, y: 0, w: 100, h: 100 };
-    this.result = '';
-  }
   clear() {
     this.source = '';
     this.result = '';
-    this.original = undefined;
     this.message = '';
-  }
-  confirm() {
-    if (!this.original) return;
-    try {
-      this.result = this.captures.crop(this.original, this.crop);
-      this.message = 'Recorte confirmado. Ya puedes exportarlo.';
-    } catch (error) {
-      this.result = '';
-      this.message = error instanceof Error ? error.message : 'No se pudo recortar.';
-    }
   }
   private snapshot() {
     return {
@@ -145,54 +74,75 @@ export class App {
       date: this.date,
     };
   }
-  png() {
-    if (this.result) this.exports.png(this.snapshot());
-  }
-  async exportPdf() {
-    if (!this.result) return;
-    const data = this.snapshot(),
-      filename = this.exports.filename(data, 'pdf');
-    try {
-      (await this.exports.pdf(data)).save(filename);
-    } catch {
-      this.message =
-        'No se pudo preparar el PDF. Comprueba la conexión y vuelve a intentarlo; también puedes descargar el PNG.';
-    } finally {
-      this.changes.markForCheck();
-    }
-  }
-  async print() {
-    if (!this.result) return;
+  private async perform(format: ReportAction) {
     const data = this.snapshot();
-    const tab = window.open('about:blank', '_blank');
-    if (!tab) {
-      this.message = 'Ventana bloqueada. Descarga el PDF y ábrelo para imprimir.';
+    if (format === 'png') this.exports.png(data);
+    else if (format === 'pdf')
+      (await this.exports.pdf(data)).save(this.exports.filename(data, 'pdf'));
+    else await this.exports.print(data);
+    this.message =
+      format === 'print'
+        ? 'Se abrió el diálogo de impresión del resultado actual.'
+        : 'Se preparó la descarga ' + format.toUpperCase() + ' del resultado actual.';
+  }
+  async automatic(request: ReportExportRequest) {
+    if (this.busy) return;
+    this.clear();
+    this.fallbackAction = request.format;
+    if (!this.supported) {
+      this.fallbackOpen = true;
+      this.message =
+        'Este navegador no admite exportación automática del visor. Usa Chrome o Edge de escritorio, o sube una captura del dispositivo.';
       return;
     }
-    tab.opener = null;
+    this.busy = true;
     try {
-      const pdf = await this.exports.pdf(data);
-      pdf.autoPrint();
-      const url = URL.createObjectURL(pdf.output('blob'));
-      tab.location.href = url;
+      this.result = this.source = await this.captures.region(request.target);
+      this.date = new Date().toLocaleString('es-HN');
+      await this.perform(request.format);
+    } catch (error) {
+      this.result = this.source = '';
       this.message =
-        'PDF preparado. Usa el diálogo de impresión del visor si no se abre automáticamente.';
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch {
-      tab.close();
-      this.message =
-        'No se pudo preparar el PDF para imprimir. Comprueba la conexión y vuelve a intentarlo.';
+        error instanceof DOMException && error.name === 'NotAllowedError'
+          ? 'Permiso cancelado o rechazado. Vuelve a pulsar la acción y selecciona la pestaña de este portal.'
+          : error instanceof Error
+            ? error.message
+            : 'No se pudo exportar el resultado. Vuelve a intentarlo.';
     } finally {
+      this.busy = false;
       this.changes.markForCheck();
     }
   }
-  async share(format: 'png' | 'pdf' = 'png') {
-    if (!this.result) return;
+  async upload(event: Event) {
+    if (this.busy) return;
+    const input = event.target as HTMLInputElement,
+      file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    this.clear();
+    if (!file.type.startsWith('image/') || file.size > 20 * 1024 * 1024) {
+      this.message = 'Selecciona una imagen de hasta 20 MB.';
+      return;
+    }
+    this.busy = true;
+    const url = URL.createObjectURL(file),
+      format = this.fallbackAction;
     try {
-      this.message = await this.exports.share(this.snapshot(), format);
-    } catch {
-      this.message = 'No se pudo preparar el archivo. Descarga el PNG o vuelve a intentarlo.';
+      const image = await this.captures.image(url);
+      this.result = this.source = this.captures.crop(image, { x: 0, y: 0, w: 100, h: 100 });
+      this.date = new Date().toLocaleString('es-HN');
+      await this.perform(format);
+    } catch (error) {
+      this.result = this.source = '';
+      this.message =
+        error instanceof DOMException && error.name === 'EncodingError'
+          ? 'Imagen inválida. Usa PNG o JPEG.'
+          : error instanceof Error
+            ? error.message
+            : 'No se pudo procesar la imagen.';
     } finally {
+      URL.revokeObjectURL(url);
+      this.busy = false;
       this.changes.markForCheck();
     }
   }

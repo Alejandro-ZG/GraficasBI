@@ -46,3 +46,30 @@ describe('Permisos y liberación de pantalla', () => {
     expect(stop).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('Identidad de la pestaña exportada', () => {
+  afterEach(() => vi.restoreAllMocks());
+  it('rechaza otra pestaña y libera las pistas sin exportar sus píxeles', async () => {
+    const stop = vi.fn();
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: {
+        setCaptureHandleConfig: vi.fn(),
+        getDisplayMedia: vi
+          .fn()
+          .mockResolvedValue({
+            getVideoTracks: () => [{ getCaptureHandle: () => ({ handle: 'otra-pestana' }) }],
+            getTracks: () => [{ stop }],
+          }),
+      },
+    });
+    const service = TestBed.inject(CaptureService);
+    vi.spyOn(service, 'supported', 'get').mockReturnValue(true);
+    const iframe = document.createElement('iframe');
+    iframe.scrollIntoView = vi.fn();
+    vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    await expect(service.region(iframe)).rejects.toThrow('Selecciona la pestaña de este portal');
+    expect(stop).toHaveBeenCalledTimes(1);
+    expect(iframe.getAttribute('style')).toBeNull();
+  });
+});

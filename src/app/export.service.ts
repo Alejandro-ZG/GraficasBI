@@ -14,6 +14,25 @@ export function fitImage(width: number, height: number, maxWidth = 277, maxHeigh
 }
 @Injectable({ providedIn: 'root' })
 export class ExportService {
+  async print(data: CaptureExport) {
+    const sheet = document.createElement('section');
+    sheet.className = 'print-sheet';
+    const heading = document.createElement('h1');
+    heading.textContent = data.title + ' · ' + data.department;
+    const caption = document.createElement('p');
+    caption.textContent = data.date + ' · Estado visible del informe';
+    const image = new Image();
+    image.src = data.image;
+    image.alt = data.title;
+    sheet.append(heading, caption, image);
+    document.body.append(sheet);
+    try {
+      await image.decode();
+      window.print();
+    } finally {
+      sheet.remove();
+    }
+  }
   filename(data: CaptureExport, ext: string) {
     return data.reportId + '-' + new Date().toISOString().replace(/[:.]/g, '-') + '.' + ext;
   }

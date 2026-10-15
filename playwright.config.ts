@@ -19,11 +19,19 @@ export default defineConfig({
   projects: [
     {
       name: 'chrome',
-      use: { ...devices['Desktop Chrome'], ...(process.env['CI'] ? {} : { channel: 'chrome' }) },
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: { args: ['--auto-accept-this-tab-capture'] },
+        ...(process.env['CI'] ? {} : { channel: 'chrome' }),
+      },
     },
     {
       name: 'edge',
-      use: { ...devices['Desktop Edge'], ...(process.env['CI'] ? {} : { channel: 'msedge' }) },
+      use: {
+        ...devices['Desktop Edge'],
+        launchOptions: { args: ['--auto-accept-this-tab-capture'] },
+        ...(process.env['CI'] ? {} : { channel: 'msedge' }),
+      },
     },
     ...(process.env['TEST_FIREFOX']
       ? [{ name: 'firefox', use: { ...devices['Desktop Firefox'] } }]

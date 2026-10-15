@@ -6,6 +6,17 @@ export interface Crop {
   w: number;
   h: number;
 }
+export type ReportAction = 'png' | 'pdf' | 'print';
+export interface ReportExportRequest {
+  format: ReportAction;
+  target: HTMLElement;
+}
+interface PortalCaptureTrack extends MediaStreamTrack {
+  getCaptureHandle?(): { handle?: string } | null;
+}
+interface CaptureDevices extends MediaDevices {
+  setCaptureHandleConfig?(config: { handle: string; permittedOrigins: string[] }): void;
+}
 export function cropPixels(width: number, height: number, crop: Crop) {
   const { x, y, w, h } = crop;
   if (
@@ -30,6 +41,89 @@ export function cropPixels(width: number, height: number, crop: Crop) {
 
 @Injectable({ providedIn: 'root' })
 export class CaptureService {
+  private readonly handle = crypto.randomUUID();
+  private configured = false;
+  constructor() {
+    try {
+      const devices = navigator.mediaDevices as CaptureDevices | undefined;
+      if (devices?.setCaptureHandleConfig) {
+        devices.setCaptureHandleConfig({
+          handle: this.handle,
+          permittedOrigins: [location.origin],
+        });
+        this.configured = true;
+      }
+    } catch {
+      this.configured = false;
+    }
+  }
+  get automaticSupported() {
+    return this.supported && this.configured;
+  }
+  async region(element: HTMLElement): Promise<string> {
+    if (!this.automaticSupported)
+      throw new Error(
+        'Este navegador no admite exportación automática del visor. Usa Chrome o Edge de escritorio, o sube una captura del dispositivo.',
+      );
+    const style = element.getAttribute('style'),
+      scroll = { x: scrollX, y: scrollY };
+    let stream: MediaStream | undefined;
+    const video = document.createElement('video');
+    try {
+      element.style.height =
+        Math.min(element.getBoundingClientRect().height, innerHeight - 24) + 'px';
+      element.style.minHeight = '0';
+      element.style.maxHeight = 'none';
+      element.scrollIntoView({ block: 'center', behavior: 'instant' });
+      // Keep the user gesture: obtain permission before any asynchronous processing.
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { displaySurface: 'browser' },
+        audio: false,
+        preferCurrentTab: true,
+      } as DisplayMediaStreamOptions);
+      const track = stream.getVideoTracks()[0] as PortalCaptureTrack;
+      // Coordinates are only valid for this exact tab, never another tab/window/screen.
+      if (track.getCaptureHandle?.()?.handle !== this.handle)
+        throw new Error(
+          'Selecciona la pestaña de este portal para exportar automáticamente. No elijas otra pestaña, ventana o pantalla.',
+        );
+      video.srcObject = stream;
+      video.muted = true;
+      video.playsInline = true;
+      await video.play();
+      const rect = element.getBoundingClientRect();
+      if (
+        rect.left < 0 ||
+        rect.top < 0 ||
+        rect.right > innerWidth + 1 ||
+        rect.bottom > innerHeight + 1 ||
+        !video.videoWidth ||
+        !video.videoHeight
+      )
+        throw new Error('El visor debe quedar visible para exportarlo. Vuelve a intentarlo.');
+      // Read only the authorized video, using the host iframe's outer bounds.
+      // No access to the Power BI document or DOM is attempted.
+      const sx = video.videoWidth / innerWidth,
+        sy = video.videoHeight / innerHeight;
+      const x = Math.round(rect.left * sx),
+        y = Math.round(rect.top * sy);
+      const width = Math.round(rect.right * sx) - x,
+        height = Math.round(rect.bottom * sy) - y;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('No se pudo preparar la imagen.');
+      ctx.drawImage(video, x, y, width, height, 0, 0, width, height);
+      return canvas.toDataURL('image/png');
+    } finally {
+      stream?.getTracks().forEach((track) => track.stop());
+      video.srcObject = null;
+      if (style === null) element.removeAttribute('style');
+      else element.setAttribute('style', style);
+      window.scrollTo({ left: scroll.x, top: scroll.y, behavior: 'instant' });
+    }
+  }
   get supported() {
     return window.isSecureContext && !!navigator.mediaDevices?.getDisplayMedia;
   }

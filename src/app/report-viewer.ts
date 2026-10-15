@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Report, validateReportUrl } from './catalog';
+import { ReportExportRequest } from './capture.service';
 @Component({
   selector: 'app-report-viewer',
   template: `<section class="panel report-viewer" #viewer aria-labelledby="report-title">
@@ -26,14 +27,26 @@ import { Report, validateReportUrl } from './catalog';
     <div class="actions">
       <button class="secondary" (click)="fullscreen(viewer)">Pantalla completa / Salir</button
       ><button class="secondary" (click)="reload(frame)" [disabled]="busy()">
-        Recargar informe</button
-      ><button (click)="capture.emit()" [disabled]="busy() || !supported()">
-        Capturar resultado
+        Recargar informe
+      </button>
+      <button (click)="exportRequest.emit({ format: 'png', target: frame })" [disabled]="busy()">
+        Descargar imagen
+      </button>
+      <button (click)="exportRequest.emit({ format: 'pdf', target: frame })" [disabled]="busy()">
+        Descargar PDF
+      </button>
+      <button (click)="exportRequest.emit({ format: 'print', target: frame })" [disabled]="busy()">
+        Imprimir
       </button>
     </div>
     <p class="hint">
-      Recargar puede reiniciar los filtros. El portal no puede forzar la actualización de la caché
-      pública.
+      Aplica tus filtros y elige descargar o imprimir. Autoriza la captura de
+      <strong>esta pestaña del portal</strong>: el área del informe se detecta automáticamente, sin
+      editar ni recortar.
+    </p>
+    <p class="hint">
+      Se exporta el área visible del informe. Recargar puede reiniciar los filtros y no fuerza la
+      actualización de la caché de Power BI.
     </p>
     @if (waiting) {
       <p role="status" class="hint">
@@ -55,7 +68,7 @@ export class ReportViewer {
   readonly department = input.required<string>();
   readonly supported = input(false);
   readonly busy = input(false);
-  readonly capture = output<void>();
+  readonly exportRequest = output<ReportExportRequest>();
   readonly notice = output<string>();
   private readonly changes = inject(ChangeDetectorRef);
   private readonly sanitizer = inject(DomSanitizer);

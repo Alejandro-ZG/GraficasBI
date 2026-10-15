@@ -1,31 +1,34 @@
 # Validación del MVP
 
-Fecha: 15 de octubre de 2026.
+15 de octubre de 2026. Flujo actualizado: descargar imagen, descargar PDF o imprimir con delimitación automática del visor, sin editor ni confirmación de recorte.
 
 ## Verificado
 
-- Build de producción con base `/GraficasBI/` correcto, paquete inicial aproximado de 245 kB; jsPDF se carga bajo demanda.
-- 20 pruebas unitarias aprobadas: catálogo, selección, recorte, proporciones PDF, errores de permisos, liberación de pistas, recarga, pantalla completa y búsqueda.
-- 22 pruebas de navegador aprobadas en Chrome, Edge, WebKit y vistas emuladas de Pixel 7 e iPhone 13. Tres casos de MediaStream simulado se omiten fuera de Chrome/Edge, donde se ejecutan.
-- Navegación, selección de TRANS, búsqueda, ausencia de desbordamiento horizontal, rechazo de imágenes corruptas, recuperación tras cancelar permisos y captura de un fotograma con fuente simulada.
-- Carga de PNG de 800 x 400, recorte central a 400 x 200 y comprobación exacta de los píxeles seleccionados.
-- Descargas reales de PNG y PDF; los cinco PDF generados contienen el título correcto y la imagen de 400 x 200 con el color esperado. PDF renderizado e inspeccionado visualmente.
-- Preparación del PDF para impresión abre una ventana; compartir sin soporte descarga el archivo.
-- Portada revisada visualmente en escritorio y vista móvil.
+- Build de producción correcto. jsPDF se descarga bajo demanda.
+- Pruebas unitarias: catálogo, selección, proporciones, errores de permisos, detención de pistas, identidad de la pestaña, recarga, pantalla completa y búsqueda.
+- Pruebas completas en Chrome y Edge: Screen Capture API real del navegador de pruebas, verificación de la pestaña mediante Capture Handle y extracción automática del rectángulo del iframe. PNG/PDF se descargan sin pasos intermedios; impresión genera una hoja con solo el resultado y su título/fecha.
+- Se comprueban dimensiones exactas y píxeles centrales del área exportada; no debe incluir botones ni el resto de la página. Las pistas se detienen y se restaura el tamaño del visor y la posición de scroll.
+- En WebKit y vistas móviles emuladas se comprueban selección de departamentos, carga y descarga de una imagen completa sin editor, rechazo de archivos corruptos y alternativa para navegadores sin captura automática.
+- Las pruebas no editan ni reconstruyen el informe Power BI. El iframe se conserva al volver a la portada y se descarta la imagen previa al cambiar de informe.
+- Se validó además el informe público TRANS real: filtro «15 y +», descarga PNG/PDF y estado visual filtrado.
 
-## Límites que requieren comprobación en el dispositivo
+El navegador aislado de pruebas usa la opción oficial de Chromium `--auto-accept-this-tab-capture` para aceptar la captura de su propia pestaña de prueba. Esa opción no se utiliza en el sitio publicado: cada usuario debe conceder permiso.
 
-- El permiso y selector reales de Screen Capture API dependen del navegador y del sistema. La prueba automatizada simula la fuente y la cancelación; no demuestra la interacción del selector nativo ni el contenido de un informe real filtrado.
-- Android/iPhone se probaron mediante emulación de tamaño, interacción táctil y motor. No se dispone de teléfonos físicos para certificar el menú nativo de compartir ni la captura nativa.
-- No se envió ningún documento a una impresora física. Se verificó la preparación del PDF y la apertura de su ventana.
-- Firefox quedó sin verificar: su ejecutable no pudo arrancar en este entorno Windows (`spawn UNKNOWN`). Se mantiene como proyecto de prueba opcional.
-- Salud Ambiental está preparado como departamento sin informe, pendiente del enlace público del responsable.
-- Power BI es externo: su disponibilidad, filtros, datos y caché dependen de Microsoft. La aplicación no accede al DOM del iframe ni puede forzar una actualización del modelo.
+## Límites
 
-## Comprobación manual reproducible
+- La aplicación solicita autorización y exige la pestaña exacta del portal. Si se elige otra pestaña, ventana o pantalla, detiene la captura y muestra un mensaje; no estima coordenadas de una fuente ajena.
+- La exportación toma el área visible del iframe, incluidos los filtros visibles. No captura páginas internas ni contenido de Power BI que no esté visible.
+- En dispositivos sin Screen Capture y Capture Handle se ofrece subir una captura del sistema. Se exporta la imagen completa, sin edición.
+- Las vistas móviles emuladas no certifican el comportamiento de un teléfono físico. El diálogo nativo de impresión tampoco se envió a una impresora física.
+- Firefox no pudo iniciar en este entorno Windows (`spawn UNKNOWN`); no se declara validado.
+- Salud Ambiental sigue pendiente del enlace público real.
+- La actualización de los datos y la caché pública dependen de Power BI.
 
-1. Abrir el sitio por HTTPS en Chrome o Edge, seleccionar TRANS y filtrar el informe.
-2. Capturar resultado, elegir la pestaña o ventana correcta en el selector nativo y comprobar la imagen.
-3. Recortar y comparar PNG/PDF con el resultado visible; probar impresión y compartir.
-4. Cancelar el permiso y volver a intentar; debe aparecer un mensaje y quedar disponibles los botones.
-5. En Android/iOS, hacer una captura del sistema, subirla y repetir recorte y descarga; probar el menú nativo si está disponible.
+## Prueba manual
+
+1. Abrir por HTTPS en Chrome o Edge de escritorio y aplicar filtros en TRANS.
+2. Pulsar Descargar imagen o Descargar PDF; en el selector nativo elegir la pestaña del portal.
+3. Comprobar que el archivo contiene solo el visor y el estado filtrado, sin editor intermedio.
+4. Repetir con Imprimir; revisar la hoja y elegir impresora o guardar como PDF.
+5. Cancelar el permiso o elegir otra pestaña: debe aparecer un mensaje y quedar la interfaz disponible.
+6. En móvil, desplegar Usar una captura del dispositivo, elegir acción y subir una captura reciente. La acción se ejecuta sobre la imagen completa.

@@ -109,85 +109,44 @@
       [department]="department.name"
       [busy]="busy"
       [supported]="supported"
-      (capture)="capture()"
+      (exportRequest)="automatic($event)"
       (notice)="message = $event"
     />
-    <section class="panel capture">
-      <p class="eyebrow">GUARDAR UN RESULTADO</p>
-      <h2>De la consulta a la captura</h2>
-      <p>
-        Elige la pestaña o ventana que contiene el informe. Solo se captura el área visible. El
-        navegador solicitará tu permiso para tomar una imagen.
-      </p>
-      <div class="actions">
-        <button (click)="capture()" [disabled]="busy || !supported">
-          {{ busy ? 'Capturando…' : 'Capturar resultado' }}</button
-        ><label class="upload"
-          >Subir captura<input
-            [disabled]="busy"
-            type="file"
-            accept="image/*"
-            (change)="upload($event)"
-        /></label>
-      </div>
-      @if (!supported) {
-        <p class="hint">
-          La captura directa no está disponible. Toma una captura con tu dispositivo y súbela.
-        </p>
-      }
-      <p class="hint">
-        Procesamiento local: las imágenes no se guardan en servidores. El enlace al informe no
-        conserva los filtros.
-      </p>
-    </section>
     @if (message) {
       <p class="notice" role="status">{{ message }}</p>
     }
-    @if (source) {
-      <section class="panel">
-        <p class="eyebrow">VISTA PREVIA</p>
-        <h2>Recorta el área del informe</h2>
-        <p>Ajusta el área con los porcentajes. El rectángulo muestra qué parte se exportará.</p>
-        <div class="preview">
-          <img [src]="source" alt="Captura original" />
-          <div
-            class="selection"
-            [style.left.%]="crop.x"
-            [style.top.%]="crop.y"
-            [style.width.%]="crop.w"
-            [style.height.%]="crop.h"
-          ></div>
-        </div>
-        <div class="fields">
-          @for (key of fields; track key) {
-            <label
-              >{{ labels[key] }} (%)<input
-                type="number"
-                min="0"
-                max="100"
-                [value]="crop[key]"
-                (input)="change(key, $event)"
-            /></label>
-          }
-        </div>
-        <div class="actions">
-          <button (click)="confirm()">Confirmar recorte</button
-          ><button class="secondary" (click)="reset()">Imagen completa</button
-          ><button class="secondary" (click)="clear()">Descartar</button>
-        </div>
-        @if (result) {
-          <h3>Captura confirmada</h3>
-          <img class="result" [src]="result" alt="Resultado confirmado para exportar" />
-          <p class="hint">{{ date }} · Fotografía estática del resultado visible.</p>
-          <div class="actions">
-            <button (click)="png()">Descargar PNG</button
-            ><button (click)="exportPdf()">Descargar PDF</button
-            ><button class="secondary" (click)="print()">Preparar impresión</button
-            ><button class="secondary" (click)="share()">Compartir PNG</button
-            ><button class="secondary" (click)="share('pdf')">Compartir PDF</button>
-          </div>
-        }
-      </section>
+    @if (busy) {
+      <p class="notice" role="status">Preparando el estado actual del informe…</p>
+    }
+    <details class="panel" [open]="fallbackOpen">
+      <summary>Usar una captura del dispositivo</summary>
+      <p>
+        Alternativa para móviles y navegadores sin captura automática. Sube una captura reciente: se
+        usará la imagen completa, sin edición.
+      </p>
+      <label
+        >Acción<select
+          aria-label="Acción para la captura"
+          [value]="fallbackAction"
+          (change)="fallbackAction = $any($event.target).value"
+        >
+          <option value="png">Descargar imagen PNG</option>
+          <option value="pdf">Descargar PDF</option>
+          <option value="print">Imprimir</option>
+        </select></label
+      >
+      <label class="upload"
+        >Subir captura<input
+          type="file"
+          accept="image/*"
+          [disabled]="busy"
+          (change)="upload($event)"
+      /></label>
+    </details>
+    @if (result) {
+      <p class="hint">
+        Última exportación: {{ date }}. Cada acción desde el visor genera una captura nueva.
+      </p>
     }
   </div>
   <footer>Portal de indicadores de salud · Capturas locales · Acceso público</footer>

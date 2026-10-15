@@ -12,18 +12,6 @@ describe('Captura', () => {
     expect(app.message).toContain('Selecciona una imagen');
     expect(app.source).toBe('');
   });
-  it('no permite exportar antes de confirmar', () => {
-    const app = TestBed.createComponent(App).componentInstance;
-    app.confirm();
-    expect(app.result).toBe('');
-  });
-  it('invalida una confirmación al cambiar el recorte', () => {
-    const app = TestBed.createComponent(App).componentInstance;
-    app.result = 'anterior';
-    app.change('w', { target: { value: '50' } } as unknown as Event);
-    expect(app.result).toBe('');
-    expect(app.crop.w).toBe(50);
-  });
   it('descarta las imágenes de la sesión', () => {
     const app = TestBed.createComponent(App).componentInstance;
     app.source = 'original';
