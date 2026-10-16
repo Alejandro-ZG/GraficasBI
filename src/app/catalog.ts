@@ -15,11 +15,19 @@ export const DEPARTMENTS: readonly Department[] = [
     name: 'Epidemiología',
     reports: [
       {
-        id: 'graficas-y-canal',
-        title: 'Gráficas y Canal',
+        id: 'graficas',
+        title: 'Gráficas',
         description: 'Consulta el informe interactivo y aplica sus filtros originales de Power BI.',
         publicEmbedUrl:
-          'https://app.powerbi.com/view?r=eyJrIjoiY2FlMjBmOTYtZGI0ZS00NzIzLWE3ZTctMjdiYzIyNWUyMTU4IiwidCI6ImFmMmZkMTk2LTFkOWYtNDdiNC05MDY5LTM5MWE0NmY4MzYwMSIsImMiOjR9',
+          'https://app.powerbi.com/view?r=eyJrIjoiY2FlMjBmOTYtZGI0ZS00NzIzLWE3ZTctMjdiYzIyNWUyMTU4IiwidCI6ImFmMmZkMTk2LTFkOWYtNDdiNC05MDY5LTM5MWE0NmY4MzYwMSIsImMiOjR9&pageName=71ece924eafb685c258f',
+      },
+      {
+        id: 'canales-endemicos',
+        title: 'Canales Endémicos',
+        description:
+          'Consulta el informe de canales endémicos y aplica sus filtros originales de Power BI.',
+        publicEmbedUrl:
+          'https://app.powerbi.com/view?r=eyJrIjoiZmExZTFiMjctZDg0OC00YzE4LTkzNTgtZGIzYjFhNjgxZGU0IiwidCI6ImFmMmZkMTk2LTFkOWYtNDdiNC05MDY5LTM5MWE0NmY4MzYwMSIsImMiOjR9',
       },
     ],
   },

@@ -36,7 +36,7 @@ export class App {
   selectReport(departmentId: string, reportId: string) {
     const department = this.departments.find((d) => d.id === departmentId);
     const report = department?.reports.find((r) => r.id === reportId);
-    if (!department || !report) return;
+    if (!department || !report || !report.publicEmbedUrl) return;
     this.home = false;
     if (report === this.report) return;
     const url = validateReportUrl(report.publicEmbedUrl);

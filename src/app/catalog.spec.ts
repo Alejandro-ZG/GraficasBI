@@ -1,11 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { DEPARTMENTS, validateReportUrl } from './catalog';
 describe('Catálogo público', () => {
-  it('incluye Gráficas y Canal en Epidemiología', () => {
+  it('separa los dos informes de Epidemiología', () => {
     expect(DEPARTMENTS[0].name).toBe('Epidemiología');
-    expect(DEPARTMENTS[0].reports[0].title).toBe('Gráficas y Canal');
+    expect(DEPARTMENTS[0].reports.map((report) => report.title)).toEqual([
+      'Gráficas',
+      'Canales Endémicos',
+    ]);
     expect(validateReportUrl(DEPARTMENTS[0].reports[0].publicEmbedUrl)).toContain(
-      'https://app.powerbi.com/view?r=',
+      '&pageName=71ece924eafb685c258f',
     );
   });
   it('rechaza otros orígenes y protocolos', () => {

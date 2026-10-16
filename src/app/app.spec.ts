@@ -1,6 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 describe('Catálogo', () => {
+  it('permite cambiar entre canales endémicos y gráficas', () => {
+    const app = TestBed.createComponent(App).componentInstance;
+    app.selectReport('epidemiologia', 'canales-endemicos');
+    expect(app.report.title).toBe('Canales Endémicos');
+    expect(app.url).toContain('r=eyJrIjoiZmExZTFiMjct');
+    expect(app.home).toBe(false);
+    app.selectReport('epidemiologia', 'graficas');
+    expect(app.report.title).toBe('Gráficas');
+    expect(new URL(app.url).searchParams.get('pageName')).toBe('71ece924eafb685c258f');
+  });
   it('selecciona el informe de TRANS', () => {
     const app = TestBed.createComponent(App).componentInstance;
     app.selectReport('trans', 'trans-puerto-cortes');

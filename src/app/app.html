@@ -39,7 +39,9 @@
             <p class="eyebrow">DEPARTAMENTO</p>
             <h2>{{ area.name }}</h2>
             @if (area.reports.length) {
-              <p>{{ area.reports.length }} informe disponible</p>
+              <p>
+                {{ area.reports.length }} {{ area.reports.length === 1 ? 'informe' : 'informes' }}
+              </p>
             } @else {
               <p>
                 Próximamente. El informe se incorporará cuando esté disponible su enlace público.
@@ -49,9 +51,13 @@
               <div class="report-entry">
                 <h3>{{ item.title }}</h3>
                 <p>{{ item.description }}</p>
-                <button (click)="selectReport(area.id, item.id)">
-                  Consultar informe <span aria-hidden="true">→</span>
-                </button>
+                @if (item.publicEmbedUrl) {
+                  <button (click)="selectReport(area.id, item.id)">
+                    Consultar informe <span aria-hidden="true">→</span>
+                  </button>
+                } @else {
+                  <p class="hint">Pendiente de enlace público.</p>
+                }
               </div>
             }
           </article>
@@ -88,6 +94,8 @@
           <button
             [class.secondary]="report.id !== item.id"
             [attr.aria-pressed]="report.id === item.id"
+            [disabled]="!item.publicEmbedUrl"
+            [attr.title]="item.publicEmbedUrl ? null : 'Pendiente de enlace público'"
             (click)="selectReport(department.id, item.id)"
           >
             {{ item.title }}

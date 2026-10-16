@@ -10,9 +10,13 @@ test('cada departamento muestra solo sus informes', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: 'Informes de Epidemiología' })).toBeVisible();
   await expect(page.getByText('Trans_PuertoCortés', { exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Todos los departamentos' }).click();
-  await page.getByRole('button', { name: 'Consultar informe' }).nth(1).click();
+  await page
+    .locator('article')
+    .filter({ has: page.getByRole('heading', { name: 'TRANS', exact: true }) })
+    .getByRole('button', { name: 'Consultar informe' })
+    .click();
   await expect(page.getByRole('navigation', { name: 'Informes de TRANS' })).toBeVisible();
-  await expect(page.getByText('Gráficas y Canal', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Gráficas', { exact: true })).toHaveCount(0);
   await expect(page.locator('iframe')).toHaveAttribute('title', 'Trans_PuertoCortés');
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
