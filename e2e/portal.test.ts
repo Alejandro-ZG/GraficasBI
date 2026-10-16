@@ -6,14 +6,14 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 test('cada departamento muestra solo sus informes', async ({ page }) => {
-  await page.getByRole('button', { name: 'Consultar informe' }).first().click();
+  await page.getByRole('button', { name: 'Ver informe' }).first().click();
   await expect(page.getByRole('navigation', { name: 'Informes de Epidemiología' })).toBeVisible();
   await expect(page.getByText('Trans_PuertoCortés', { exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Todos los departamentos' }).click();
   await page
     .locator('article')
     .filter({ has: page.getByRole('heading', { name: 'TRANS', exact: true }) })
-    .getByRole('button', { name: 'Consultar informe' })
+    .getByRole('button', { name: 'Ver informe' })
     .click();
   await expect(page.getByRole('navigation', { name: 'Informes de TRANS' })).toBeVisible();
   await expect(page.getByText('Gráficas', { exact: true })).toHaveCount(0);
@@ -23,8 +23,15 @@ test('cada departamento muestra solo sus informes', async ({ page }) => {
   ).toBeTruthy();
 });
 test('consulta sin funciones de captura o exportación', async ({ page }, info) => {
-  await expect(page.getByText('PC y móvil', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Consultar informe' }).first().click();
+  const logo = page.getByRole('img', { name: 'Secretaría de Salud de Honduras' });
+  await expect(logo).toBeVisible();
+  await expect
+    .poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth))
+    .toBeGreaterThan(0);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+  ).toBeTruthy();
+  await page.getByRole('button', { name: 'Ver informe' }).first().click();
   await expect(
     page.getByRole('button', { name: /Descargar|Imprimir|Capturar|Compartir/ }),
   ).toHaveCount(0);
