@@ -19,17 +19,17 @@ import { Report, validateReportUrl } from './catalog';
       </div>
       <a [href]="url()" target="_blank" rel="noopener noreferrer">Abrir original ↗</a>
     </div>
-    <p class="hint">
-      Aplica los filtros dentro del informe. Si no carga, abre el original. La actualización de los
-      datos depende de Power BI.
-    </p>
+    <p class="hint">Usa los filtros dentro del informe.</p>
     <div class="actions">
       <button class="secondary" (click)="fullscreen(viewer)">Pantalla completa / Salir</button
-      ><button class="secondary" (click)="reload(frame)">Recargar informe</button>
+      ><button
+        class="secondary"
+        title="Puede reiniciar los filtros; no fuerza la actualización de los datos."
+        (click)="reload(frame)"
+      >
+        Recargar informe
+      </button>
     </div>
-    <p class="hint">
-      Recargar puede reiniciar los filtros y no fuerza la actualización de la caché de Power BI.
-    </p>
     @if (waiting) {
       <p role="status" class="hint">
         El visor está tardando. Puedes abrir el informe original o recargarlo.

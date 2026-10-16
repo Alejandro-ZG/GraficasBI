@@ -1,28 +1,16 @@
 <header>
   <button class="brand brand-button" (click)="showHome()" aria-label="Ir al inicio">
-    ✚ <span>Portal de indicadores<small>INFORMACIÓN PARA LA SALUD</small></span></button
-  ><span class="badge">Consulta pública</span>
+    <img class="sesal-logo" src="logo-sesal-2026.png" alt="Secretaría de Salud de Honduras" />
+    <span>Portal de indicadores<small>SECRETARÍA DE SALUD</small></span></button
+  ><span class="badge">Acceso público</span>
 </header>
 <main>
-  <div class="intro">
-    <p class="eyebrow">OBSERVATORIO DE SALUD</p>
-    <h1>Los datos, a tu alcance.</h1>
-    <p>Consulta los indicadores de salud y explora sus filtros por departamento.</p>
-  </div>
   @if (home) {
-    <section class="overview" aria-label="Explorar indicadores">
-      <div>
-        <strong>{{ availableDepartments }}</strong
-        ><span>Departamentos disponibles</span>
-      </div>
-      <div><strong>Power BI</strong><span>Informes interactivos originales</span></div>
-      <div><strong>PC y móvil</strong><span>Consulta desde tu dispositivo</span></div>
-    </section>
     <section aria-labelledby="catalog-title">
       <div class="heading">
         <div>
-          <p class="eyebrow">EXPLORA POR DEPARTAMENTO</p>
-          <h2 id="catalog-title">Información para cada consulta</h2>
+          <p class="eyebrow">INDICADORES DE SALUD</p>
+          <h1 id="catalog-title">Informes por departamento</h1>
         </div>
         <label class="search"
           >Buscar informes<input
@@ -35,25 +23,23 @@
       <div class="department-grid">
         @for (area of filteredDepartments; track area.id) {
           <article class="panel department-card">
-            <span class="department-icon" aria-hidden="true">{{ area.name.charAt(0) }}</span>
-            <p class="eyebrow">DEPARTAMENTO</p>
-            <h2>{{ area.name }}</h2>
+            <div class="department-title">
+              <span class="department-icon" aria-hidden="true">{{ area.name.charAt(0) }}</span>
+              <h2>{{ area.name }}</h2>
+            </div>
             @if (area.reports.length) {
               <p>
                 {{ area.reports.length }} {{ area.reports.length === 1 ? 'informe' : 'informes' }}
               </p>
             } @else {
-              <p>
-                Próximamente. El informe se incorporará cuando esté disponible su enlace público.
-              </p>
+              <p>Próximamente</p>
             }
             @for (item of area.reports; track item.id) {
               <div class="report-entry">
                 <h3>{{ item.title }}</h3>
-                <p>{{ item.description }}</p>
                 @if (item.publicEmbedUrl) {
                   <button (click)="selectReport(area.id, item.id)">
-                    Consultar informe <span aria-hidden="true">→</span>
+                    Ver informe <span aria-hidden="true">→</span>
                   </button>
                 } @else {
                   <p class="hint">Pendiente de enlace público.</p>
@@ -64,23 +50,6 @@
         } @empty {
           <p class="panel" role="status">No se encontraron informes. Prueba con otro nombre.</p>
         }
-      </div>
-    </section>
-    <section class="panel guide">
-      <p class="eyebrow">CÓMO UTILIZAR EL PORTAL</p>
-      <div class="guide-steps">
-        <div>
-          <h3>01 · Consulta</h3>
-          <p>Selecciona un departamento y abre su informe.</p>
-        </div>
-        <div>
-          <h3>02 · Filtra</h3>
-          <p>Ajusta los filtros originales dentro de Power BI.</p>
-        </div>
-        <div>
-          <h3>03 · Explora</h3>
-          <p>Amplía el visor o abre el informe original para consultar sus gráficos.</p>
-        </div>
       </div>
     </section>
   }
@@ -102,7 +71,6 @@
           </button>
         }
       </div>
-      <p>{{ report.description }}</p>
     </nav>
     <app-report-viewer
       [report]="report"
@@ -113,5 +81,5 @@
       <p class="notice" role="status">{{ message }}</p>
     }
   </div>
-  <footer>Portal de indicadores de salud · Informes interactivos · Acceso público</footer>
+  <footer>Secretaría de Salud · Honduras</footer>
 </main>

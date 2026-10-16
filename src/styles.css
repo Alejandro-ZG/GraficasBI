@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 :root {
   font-family: Arial, Helvetica, sans-serif;
-  color: #173442;
-  background: #f3f6f6;
+  color: #193653;
+  background: #f5f7fa;
 }
 * {
   box-sizing: border-box;
@@ -17,73 +17,84 @@ input {
 }
 header {
   background: white;
-  border-bottom: 1px solid #dce6e7;
-  padding: 22px 5vw;
+  border-top: 4px solid #b18a16;
+  border-bottom: 1px solid #dfe5ed;
+  padding: 14px max(24px, calc((100vw - 1232px) / 2));
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
 }
 .brand {
   display: flex;
-  gap: 12px;
-  text-decoration: none;
+  gap: 20px;
   font-size: 23px;
   font-weight: 700;
-  color: #087f80;
+  color: #204f91;
 }
 .brand small {
   display: block;
   font-size: 10px;
   letter-spacing: 2px;
-  margin-top: 6px;
-  color: #607781;
+  margin-top: 8px;
+  color: #637386;
+}
+.sesal-logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+.brand-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  align-items: center;
 }
 .badge {
   font-size: 12px;
-  background: #e9f4ef;
+  border: 1px solid #dfe5ed;
   padding: 8px 12px;
   border-radius: 20px;
-  color: #277553;
+  color: #637386;
+  white-space: nowrap;
 }
 main {
   max-width: 1280px;
   margin: auto;
-  padding: 42px 24px;
-}
-.intro {
-  max-width: 700px;
-  margin-bottom: 32px;
+  padding: 40px 24px 20px;
 }
 h1 {
-  font-size: clamp(30px, 5vw, 48px);
+  font-size: clamp(26px, 3vw, 36px);
   font-weight: 700;
-  letter-spacing: -1.8px;
-  margin: 10px 0 14px;
+  letter-spacing: -1px;
+  margin: 8px 0 0;
+  line-height: 1.2;
 }
 p {
-  line-height: 1.65;
+  line-height: 1.6;
   margin: 10px 0;
-  color: #526b77;
+  color: #637386;
 }
 .eyebrow {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 2px;
-  color: #087f80;
+  letter-spacing: 1.7px;
+  color: #997515;
 }
 h2 {
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 700;
   margin: 6px 0;
 }
 h3 {
-  font-weight: 700;
-  margin: 24px 0 12px;
+  font-weight: 600;
+  margin: 0;
 }
 .panel {
   background: white;
-  border: 1px solid #dce6e7;
-  border-radius: 14px;
+  border: 1px solid #dfe5ed;
+  border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
 }
@@ -91,23 +102,14 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 15px;
+  gap: 24px;
 }
 a {
-  color: #087f80;
-}
-iframe {
-  width: 100%;
-  height: 650px;
-  border: 1px solid #dce6e7;
-  border-radius: 8px;
-  background: #f4f7f8;
-  margin-top: 12px;
+  color: #204f91;
 }
 .hint {
   font-size: 12px;
 }
-
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -115,15 +117,17 @@ iframe {
   margin-top: 18px;
 }
 button {
-  background: #087f80;
+  background: #204f91;
   color: white;
-  border: 1px solid #087f80;
+  border: 1px solid #204f91;
   border-radius: 7px;
-  padding: 11px 17px;
+  padding: 10px 15px;
   font-weight: 600;
   font-size: 14px;
-  display: inline-block;
   cursor: pointer;
+}
+button:hover {
+  filter: brightness(0.95);
 }
 button:disabled {
   opacity: 0.45;
@@ -131,57 +135,101 @@ button:disabled {
 }
 .secondary {
   background: white;
-  color: #087f80;
+  color: #204f91;
 }
-
 .notice {
-  background: #e1f2ee;
+  background: #e8eff9;
   padding: 16px;
   border-radius: 7px;
   margin-bottom: 24px;
 }
 footer {
   font-size: 12px;
-  color: #69818a;
-  padding: 20px 0;
+  color: #637386;
+  padding: 24px 0;
+  border-top: 1px solid #dfe5ed;
+  margin-top: 16px;
 }
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-  outline: 3px solid #e4ab35;
+  outline: 3px solid #b18a16;
   outline-offset: 4px;
 }
-@media (max-width: 650px) {
-  header {
-    padding: 18px;
-  }
-  .brand {
-    font-size: 17px;
-  }
-  .badge {
-    display: none;
-  }
-  main {
-    padding: 28px 14px;
-  }
-  .panel {
-    padding: 16px;
-  }
-  .heading {
-    align-items: start;
-    flex-direction: column;
-  }
-  iframe {
-    height: 520px;
-  }
-  .actions > button {
-    flex-grow: 1;
-  }
+[hidden] {
+  display: none !important;
+}
+.search {
+  font-size: 12px;
+  color: #637386;
+}
+.search input {
+  display: block;
+  background: white;
+  border: 1px solid #bcc9d9;
+  padding: 12px 15px;
+  border-radius: 8px;
+  width: 280px;
+  margin-top: 7px;
+}
+.department-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+.department-card {
+  padding: 24px;
+  border-top: 3px solid #204f91;
+}
+.department-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.department-icon {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #edf2fa;
+  color: #204f91;
+  font-size: 20px;
+  font-weight: bold;
+}
+.department-card > p {
+  font-size: 12px;
+  margin: 14px 0 0;
+}
+.report-entry {
+  border-top: 1px solid #e5eaf1;
+  margin-top: 18px;
+  padding-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.report-entry h3 {
+  font-size: 14px;
+}
+.report-entry button {
+  font-size: 12px;
+  padding: 8px 10px;
 }
 .report-viewer iframe {
+  display: block;
+  width: 100%;
   height: auto;
   aspect-ratio: 16/10;
   min-height: 420px;
+  border: 1px solid #dfe5ed;
+  border-radius: 8px;
+  background: #f5f7fa;
+  margin-top: 18px;
 }
 .report-viewer:fullscreen {
   display: flex;
@@ -200,121 +248,61 @@ input:focus-visible {
 .report-viewer:fullscreen .hint {
   display: none;
 }
-@media (max-width: 650px) {
-  .report-viewer iframe {
-    aspect-ratio: 3/4;
-    min-height: 480px;
+@media (max-width: 1000px) {
+  .department-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .report-viewer:fullscreen iframe {
-    min-height: 0;
-  }
-}
-[hidden] {
-  display: none !important;
-}
-.brand-button {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  text-align: left;
-  align-items: center;
-}
-.brand-button:hover {
-  background: transparent;
-}
-.overview {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin: 32px 0 48px;
-  padding: 24px 0;
-  border-top: 1px solid #dce6e7;
-  border-bottom: 1px solid #dce6e7;
-}
-.overview strong {
-  display: block;
-  font-size: 26px;
-  color: #087f80;
-  margin-bottom: 8px;
-}
-.overview span {
-  font-size: 13px;
-  color: #526b77;
-}
-.search {
-  font-size: 12px;
-  color: #526b77;
-}
-.search input {
-  display: block;
-  background: white;
-  border: 1px solid #b7c9cc;
-  padding: 12px 15px;
-  border-radius: 8px;
-  width: 280px;
-  margin-top: 7px;
-}
-.department-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  margin-top: 24px;
-}
-.department-card {
-  padding: 28px;
-}
-.department-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: #e4f3ef;
-  color: #087f80;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-.report-entry {
-  border-top: 1px solid #e5eded;
-  margin-top: 20px;
-}
-.report-entry p {
-  font-size: 14px;
-  min-height: 48px;
-}
-.report-entry button {
-  margin-top: 12px;
-}
-.guide-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-.guide-steps p {
-  font-size: 14px;
-}
-.guide h3 {
-  margin-top: 12px;
 }
 @media (max-width: 650px) {
-  .overview {
-    grid-template-columns: 1fr;
-    gap: 22px;
-    margin-bottom: 30px;
+  header {
+    padding: 12px 16px;
   }
-  .department-grid,
-  .guide-steps {
-    grid-template-columns: 1fr;
+  .brand {
+    font-size: 17px;
+    gap: 10px;
+  }
+  .brand small {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  .sesal-logo {
+    width: 72px;
+    height: 72px;
+  }
+  .badge {
+    display: none;
+  }
+  main {
+    padding: 28px 16px 16px;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 20px;
   }
   .search,
   .search input {
     width: 100%;
   }
   .department-grid {
-    gap: 0;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 24px;
   }
   .department-card {
-    padding: 22px;
+    margin-bottom: 0;
+  }
+  .actions > button {
+    flex-grow: 1;
+  }
+  .report-viewer iframe {
+    aspect-ratio: 3/4;
+    min-height: 480px;
+  }
+  .report-viewer:fullscreen iframe {
+    min-height: 0;
   }
 }
