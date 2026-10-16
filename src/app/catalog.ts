@@ -37,7 +37,7 @@ export const DEPARTMENTS: readonly Department[] = [
     reports: [
       {
         id: 'trans-puerto-cortes',
-        title: 'Trans_PuertoCortés',
+        title: 'TRANS',
         description:
           'Informe público de TRANS de Puerto Cortés. Consulta sus gráficos y filtros originales.',
         publicEmbedUrl:

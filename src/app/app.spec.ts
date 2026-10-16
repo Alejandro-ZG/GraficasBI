@@ -15,7 +15,7 @@ describe('Catálogo', () => {
     const app = TestBed.createComponent(App).componentInstance;
     app.selectReport('trans', 'trans-puerto-cortes');
     expect(app.department.name).toBe('TRANS');
-    expect(app.report.title).toBe('Trans_PuertoCortés');
+    expect(app.report.title).toBe('TRANS');
     expect(app.home).toBe(false);
   });
   it('conserva el informe activo al volver al inicio', () => {
